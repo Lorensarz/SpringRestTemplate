@@ -5,6 +5,7 @@ import org.petrov.service.TagService;
 import org.petrov.dto.PostDto;
 import org.petrov.dto.TagDto;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,24 +20,20 @@ public class TagController {
         this.tagService = tagService;
     }
 
-    @GetMapping
-    public List<TagDto> getTagsByPost(@RequestBody PostDto postDto) {
-        return tagService.findTagsByPost(postDto);
+    @GetMapping("/{postId}")
+    public List<TagDto> getTagsByPost(@PathVariable long postId) {
+        return tagService.findTagsByPostId(postId);
     }
 
-    @PostMapping
-    public void addTagToPost(@RequestBody PostDto postDto) {
-        tagService.addTagToPost(postDto);
+    @PostMapping("/{postId}")
+    @ResponseStatus(HttpStatus.CREATED)
+    public void addTagToPost(@PathVariable long postId, @RequestBody TagDto tagDto) {
+        tagService.addTagToPost(postId, tagDto);
     }
 
-    @PutMapping
-    public void updateTagForPost(@RequestBody PostDto postDto) {
-        tagService.updateTagForPost(postDto);
-    }
-
-    @DeleteMapping
-    public void removeTagFromPost(@RequestBody PostDto postDto) {
-        tagService.removeTagFromPost(postDto);
+    @DeleteMapping("/{postId}")
+    public void removeTagFromPost(@PathVariable long postId, @RequestBody TagDto tagDto) {
+        tagService.removeTagFromPost(postId, tagDto);
     }
 
 }

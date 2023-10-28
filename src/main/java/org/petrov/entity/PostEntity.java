@@ -79,7 +79,10 @@ public class PostEntity {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         PostEntity that = (PostEntity) o;
-        return id == that.id && Objects.equals(title, that.title) && Objects.equals(content, that.content) && Objects.equals(user, that.user) && Objects.equals(tags, that.tags);
+        return id == that.id && Objects.equals(title, that.title) &&
+                Objects.equals(content, that.content) &&
+                Objects.equals(user, that.user) &&
+                Objects.equals(tags, that.tags);
     }
 
     @Override

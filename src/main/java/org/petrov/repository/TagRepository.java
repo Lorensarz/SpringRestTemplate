@@ -9,15 +9,6 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-@Repository
 public interface TagRepository extends JpaRepository <TagEntity, Long> {
-
-    void addTagToPost(PostEntity postEntity);
-
-    void updateTagsForPost(PostEntity postEntity);
-
-    void removeTagFromPost(PostEntity postEntity);
-
-    @Query("SELECT t FROM TagEntity t WHERE t.posts = :postEntity")
-    List<TagEntity> findTagsByPostId(@Param("postEntity")PostEntity entity);
+    TagEntity findByName(String name);
 }

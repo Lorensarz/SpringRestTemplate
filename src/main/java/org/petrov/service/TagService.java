@@ -6,8 +6,7 @@ import org.petrov.dto.TagDto;
 import java.util.List;
 
 public interface TagService {
-    void addTagToPost(PostDto post);
-    void removeTagFromPost(PostDto post);
-    List<TagDto> findTagsByPost(PostDto postDto);
-    void updateTagForPost(PostDto postDto);
+    void addTagToPost(long postId, TagDto tagDto);
+    void removeTagFromPost(long postId, TagDto tagDto);
+    List<TagDto> findTagsByPostId(long postId);
 }

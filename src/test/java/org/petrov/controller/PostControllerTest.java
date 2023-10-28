@@ -6,11 +6,10 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.petrov.entity.PostEntity;
-import org.petrov.entity.TagEntity;
-import org.petrov.service.PostService;
 import org.petrov.dto.PostDto;
 import org.petrov.dto.mapper.PostDtoMapper;
+import org.petrov.entity.PostEntity;
+import org.petrov.service.PostService;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
@@ -19,7 +18,6 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import static org.mockito.Mockito.*;
@@ -49,46 +47,48 @@ public class PostControllerTest {
     public void testGetPostsByUserId() throws Exception {
         List<PostEntity> posts = new ArrayList<>();
         PostEntity post1 = new PostEntity();
-
-
-        TagEntity tagEntity1 = new TagEntity();
-
-        post1.setTags(Collections.singletonList(tagEntity1));
-        posts.add(post1);
-
-
         PostEntity post2 = new PostEntity();
 
-        TagEntity tagEntity2 = new TagEntity();
+        List<PostDto> postsDto = new ArrayList<>();
+        PostDto postDto1 = new PostDto();
+        PostDto postDto2 = new PostDto();
 
-        post2.setTags(Collections.singletonList(tagEntity2));
+        posts.add(post1);
         posts.add(post2);
+        postsDto.add(postDto1);
+        postsDto.add(postDto2);
 
-        when(postService.findPostsByUserId(anyLong())).thenReturn(posts);
+        when(postService.findPostsByUserId(1L)).thenReturn(posts);
+        when(postDtoMapper.toDtoList(posts)).thenReturn(postsDto);
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/posts?user_id=1"))
+        mockMvc.perform(MockMvcRequestBuilders.get("/posts/1"))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith("application/json"))
-                .andExpect(MockMvcResultMatchers.content().json(gson.toJson(posts)));
+                .andExpect(MockMvcResultMatchers.content().json(gson.toJson(postsDto)));
     }
 
     @Test
     public void testGetAllPosts() throws Exception {
         List<PostEntity> posts = new ArrayList<>();
         PostEntity post1 = new PostEntity();
-        post1.setId(1L);
-        posts.add(post1);
-
         PostEntity post2 = new PostEntity();
-        post2.setId(2L);
+
+        List<PostDto> postsDto = new ArrayList<>();
+        PostDto postDto1 = new PostDto();
+        PostDto postDto2 = new PostDto();
+
+        posts.add(post1);
         posts.add(post2);
+        postsDto.add(postDto1);
+        postsDto.add(postDto2);
 
         when(postService.findAll()).thenReturn(posts);
+        when(postDtoMapper.toDtoList(posts)).thenReturn(postsDto);
 
         mockMvc.perform(MockMvcRequestBuilders.get("/posts"))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith("application/json"))
-                .andExpect(MockMvcResultMatchers.content().json(gson.toJson(posts)));
+                .andExpect(MockMvcResultMatchers.content().json(gson.toJson(postsDto)));
     }
 
     @Test

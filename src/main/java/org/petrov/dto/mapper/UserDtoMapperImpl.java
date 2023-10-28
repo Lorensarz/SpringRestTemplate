@@ -2,6 +2,7 @@ package org.petrov.dto.mapper;
 
 import org.petrov.dto.UserDto;
 import org.petrov.entity.UserEntity;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -12,12 +13,20 @@ import java.util.List;
 @Component
 public class UserDtoMapperImpl implements UserDtoMapper {
 
+    private final PostDtoMapper postDtoMapper;
+
+    @Autowired
+    public UserDtoMapperImpl(PostDtoMapper postDtoMapper) {
+        this.postDtoMapper = postDtoMapper;
+    }
+
     @Override
     public UserDto toDto(UserEntity user) {
         UserDto dto = new UserDto();
         dto.setId(user.getId());
         dto.setName(user.getName());
         dto.setEmail(user.getEmail());
+        dto.setPosts(postDtoMapper.toDtoList(user.getPosts()));
         return dto;
     }
 
@@ -27,6 +36,7 @@ public class UserDtoMapperImpl implements UserDtoMapper {
         user.setId(dto.getId());
         user.setName(dto.getName());
         user.setEmail(dto.getEmail());
+        user.setPosts(postDtoMapper.toEntityList(dto.getPosts()));
         return user;
     }
 

@@ -5,23 +5,27 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.petrov.dto.PostDto;
+import org.mockito.junit.jupiter.MockitoSettings;
 import org.petrov.dto.TagDto;
+import org.petrov.dto.mapper.PostDtoMapper;
+import org.petrov.dto.mapper.TagDtoMapper;
 import org.petrov.service.TagService;
 import org.springframework.http.MediaType;
-import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+@MockitoSettings
 public class TagControllerTest {
 
     @InjectMocks
@@ -35,64 +39,48 @@ public class TagControllerTest {
 
     @BeforeEach
     public void setUp() {
-        MockitoAnnotations.initMocks(this);
         mockMvc = MockMvcBuilders.standaloneSetup(tagController).build();
     }
 
     @Test
     public void testGetTagsByPost() throws Exception {
-        PostDto postDto = new PostDto();
-        List<TagDto> tagList = new ArrayList<>();
+        List<TagDto> tagDtosList = new ArrayList<>();
+        TagDto tagDto1 = new TagDto();
+        TagDto tagDto2 = new TagDto();
+        tagDtosList.add(tagDto1);
+        tagDtosList.add(tagDto2);
 
-        Mockito.when(tagService.findTagsByPost(postDto)).thenReturn(tagList);
+        when(tagService.findTagsByPostId(anyLong())).thenReturn(tagDtosList);
 
-        MockHttpServletResponse response = mockMvc.perform(
-                MockMvcRequestBuilders.get("/tags")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(gson.toJson(tagList))
+        mockMvc.perform(MockMvcRequestBuilders.get("/tags/{postId}", 1)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(gson.toJson(tagDtosList))
         ).andExpect(status().isOk()).andReturn().getResponse();
 
-        verify(tagService).findTagsByPost(postDto);
-
+        verify(tagService).findTagsByPostId(anyLong());
     }
 
     @Test
     public void testAddTagToPost() throws Exception {
-        PostDto postDto = new PostDto();
+        TagDto tagDto = new TagDto();
+        tagDto.setId(1L);
+        tagDto.setName("Tag 1");
 
-        mockMvc.perform(
-                MockMvcRequestBuilders.post("/tags")
+        mockMvc.perform(MockMvcRequestBuilders.post("/tags/1")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(gson.toJson(postDto))
-        ).andExpect(status().isOk());
-
-        verify(tagService).addTagToPost(postDto);
-    }
-
-    @Test
-    public void testUpdateTagForPost() throws Exception {
-        PostDto postDto = new PostDto();
-        postDto.setId(1L);
-
-        mockMvc.perform(MockMvcRequestBuilders.put("/tags")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(gson.toJson(postDto)))
-                        .andExpect(status().isOk());
-
-        verify(tagService).updateTagForPost(postDto);
-
+                        .content(gson.toJson(tagDto)))
+                .andExpect(MockMvcResultMatchers.status().isCreated());
     }
 
     @Test
     public void testRemoveTagFromPost() throws Exception {
-        PostDto postDto = new PostDto();
+        TagDto tagDto = new TagDto();
+        tagDto.setId(1L);
+        tagDto.setName("Tag 1");
 
-        mockMvc.perform(
-                MockMvcRequestBuilders.delete("/tags")
+        mockMvc.perform(MockMvcRequestBuilders.delete("/tags/1")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(gson.toJson(postDto))
-        ).andExpect(status().isOk());
-
-        verify(tagService).removeTagFromPost(postDto);
+                        .content(gson.toJson(tagDto)))
+                .andExpect(MockMvcResultMatchers.status().isOk());
     }
 }

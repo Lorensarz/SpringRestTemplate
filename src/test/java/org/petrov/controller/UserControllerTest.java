@@ -6,12 +6,11 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.petrov.config.AppConfig;
 import org.petrov.dto.UserDto;
+import org.petrov.dto.mapper.UserDtoMapper;
 import org.petrov.entity.UserEntity;
 import org.petrov.service.UserService;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -24,7 +23,7 @@ import java.util.List;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
 
-@ContextConfiguration(classes = {AppConfig.class})
+
 public class UserControllerTest {
 
     @Mock
@@ -32,6 +31,8 @@ public class UserControllerTest {
 
     @InjectMocks
     private UserController userController;
+    @Mock
+    private UserDtoMapper userDtoMapper;
 
     private MockMvc mockMvc;
 
@@ -62,15 +63,22 @@ public class UserControllerTest {
         UserEntity userEntity1 = new UserEntity();
         UserEntity userEntity2 = new UserEntity();
 
+        List<UserDto> usersDto = new ArrayList<>();
+        UserDto userDto1 = new UserDto();
+        UserDto userDto2 = new UserDto();
+
         userEntities.add(userEntity1);
         userEntities.add(userEntity2);
+        usersDto.add(userDto1);
+        usersDto.add(userDto2);
 
         when(userService.findAll()).thenReturn(userEntities);
+        when(userDtoMapper.toDtoList(userEntities)).thenReturn(usersDto);
 
         mockMvc.perform(MockMvcRequestBuilders.get("/users"))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith("application/json"))
-                .andExpect(MockMvcResultMatchers.content().json(gson.toJson(userEntities)));
+                .andExpect(MockMvcResultMatchers.content().json(gson.toJson(usersDto)));
     }
 
     @Test

@@ -2,11 +2,14 @@ package org.petrov.dto.mapper;
 
 import org.petrov.entity.PostEntity;
 import org.petrov.dto.PostDto;
+import org.petrov.entity.UserEntity;
+import org.petrov.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Component
 public class PostDtoMapperImpl implements PostDtoMapper {
@@ -25,7 +28,7 @@ public class PostDtoMapperImpl implements PostDtoMapper {
         dto.setId(post.getId());
         dto.setTitle(post.getTitle());
         dto.setContent(post.getContent());
-        dto.setUserId(post.getId());
+        dto.setUserId(post.getUser().getId());
         dto.setTags(tagMapper.toDtoList(post.getTags()));
         return dto;
     }
@@ -36,7 +39,9 @@ public class PostDtoMapperImpl implements PostDtoMapper {
         post.setId(dto.getId());
         post.setTitle(dto.getTitle());
         post.setContent(dto.getContent());
-        post.setId(dto.getUserId());
+        UserEntity userEntity = new UserEntity();
+        userEntity.setId(dto.getUserId());
+        post.setUser(userEntity);
         post.setTags(tagMapper.toEntityList(dto.getTags()));
         return post;
     }
@@ -44,18 +49,18 @@ public class PostDtoMapperImpl implements PostDtoMapper {
     @Override
     public List<PostDto> toDtoList(List<PostEntity> posts) {
         List<PostDto> dtoList = new ArrayList<>();
-        for (PostEntity post : posts) {
-            dtoList.add(toDto(post));
-        }
+            for (PostEntity post : posts) {
+                dtoList.add(toDto(post));
+            }
         return dtoList;
     }
 
     @Override
     public List<PostEntity> toEntityList(List<PostDto> dtoList) {
         List<PostEntity> posts = new ArrayList<>();
-        for (PostDto dto : dtoList) {
-            posts.add(toEntity(dto));
-        }
+            for (PostDto dto : dtoList) {
+                posts.add(toEntity(dto));
+            }
         return posts;
     }
 }
